@@ -109,7 +109,7 @@ API języka Vala do biblioteki libsignon-glib.
 	%{?with_static_libs:--enable-static} \
 	%{!?with_tests:--disable-tests} \
 	--with-html-dir=%{_gtkdocdir}
-%{__make}
+%{__make} -j1
 
 %install
 rm -rf $RPM_BUILD_ROOT
