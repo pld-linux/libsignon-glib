@@ -7,7 +7,7 @@ Summary:	Single signon authentication library for GLib applications
 Summary(pl.UTF-8):	Biblioteka pojedynczego uwierzytelniania dla aplikacji opartych na bibliotece GLib
 Name:		libsignon-glib
 Version:	1.10
-Release:	2
+Release:	3
 License:	LGPL v2.1
 Group:		Libraries
 #Source0Download: http://code.google.com/p/accounts-sso/downloads/list
