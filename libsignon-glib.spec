@@ -2,12 +2,12 @@
 # Conditional build:
 %bcond_without	static_libs	# static library
 %bcond_without	tests		# testsuite build [switch broken in configure]
-#
+
 Summary:	Single signon authentication library for GLib applications
 Summary(pl.UTF-8):	Biblioteka pojedynczego uwierzytelniania dla aplikacji opartych na bibliotece GLib
 Name:		libsignon-glib
 Version:	1.10
-Release:	3
+Release:	4
 License:	LGPL v2.1
 Group:		Libraries
 #Source0Download: http://code.google.com/p/accounts-sso/downloads/list
@@ -93,6 +93,9 @@ Summary(pl.UTF-8):	API języka Vala do biblioteki libsignon-glib
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
 Requires:	vala
+%if "%{_rpmversion}" >= "5"
+BuildArch:	noarch
+%endif
 
 %description -n vala-libsignon-glib
 Vala API for libsignon-glib.
