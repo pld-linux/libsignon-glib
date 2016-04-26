@@ -11,7 +11,9 @@ Release:	1
 License:	LGPL v2.1
 Group:		Libraries
 #Source0Download: https://gitlab.com/accounts-sso/libsignon-glib/tags?page=4
-Source0:	https://gitlab.com/accounts-sso/libsignon-glib/repository/archive.tar.gz?ref=VERSION_%{version}
+# TODO: in the future use fake GET arg to force sane filename on df
+#Source0:	https://gitlab.com/accounts-sso/libsignon-glib/repository/archive.tar.bz2?ref=VERSION_%{version}&fake_out=/%{name}-%{version}.tar.bz2
+Source0:	archive.tar.gz%3Fref=VERSION_%{version}
 # Source0-md5:	54a6d51db16934d36e0547b3cfbdf25f
 URL:		https://gitlab.com/accounts-sso/libsignon-glib
 BuildRequires:	autoconf >= 2.64
