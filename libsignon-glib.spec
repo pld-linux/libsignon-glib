@@ -7,7 +7,7 @@ Summary:	Single signon authentication library for GLib applications
 Summary(pl.UTF-8):	Biblioteka pojedynczego uwierzytelniania dla aplikacji opartych na bibliotece GLib
 Name:		libsignon-glib
 Version:	1.13
-Release:	1
+Release:	2
 License:	LGPL v2.1
 Group:		Libraries
 #Source0Download: https://gitlab.com/accounts-sso/libsignon-glib/tags?page=4
@@ -72,6 +72,9 @@ Statyczna biblioteka libsignon-glib.
 Summary:	API documentation for libsignon-glib library
 Summary(pl.UTF-8):	Dokumentacja API biblioteki libsignon-glib
 Group:		Documentation
+%if "%{_rpmversion}" >= "5"
+BuildArch:	noarch
+%endif
 
 %description apidocs
 API documentation for libsignon-glib library.
@@ -109,7 +112,7 @@ Vala API for libsignon-glib.
 API języka Vala do biblioteki libsignon-glib.
 
 %prep
-%setup -q -n libsignon-glib-VERSION_%{version}-b74889415b725211c46f107103577bdaddcbd1d5
+%setup -q -n %{name}-VERSION_%{version}-b74889415b725211c46f107103577bdaddcbd1d5
 
 %build
 %{__gtkdocize} --flavour no-tmpl
