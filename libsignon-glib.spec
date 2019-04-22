@@ -1,32 +1,35 @@
 #
 # Conditional build:
+%bcond_without	python2		# Python 2.x binding (deprecated, not supported upstream)
 %bcond_without	static_libs	# static library
 %bcond_without	tests		# testsuite build [switch broken in configure]
 
 Summary:	Single signon authentication library for GLib applications
 Summary(pl.UTF-8):	Biblioteka pojedynczego uwierzytelniania dla aplikacji opartych na bibliotece GLib
 Name:		libsignon-glib
-Version:	1.14
+Version:	2.1
 Release:	1
 License:	LGPL v2.1
 Group:		Libraries
-#Source0Download: https://gitlab.com/accounts-sso/libsignon-glib/tags?sort=updated_desc
-Source0:	https://gitlab.com/accounts-sso/libsignon-glib/repository/archive.tar.bz2?ref=VERSION_%{version}&fake_out=/%{name}-%{version}.tar.bz2
-# Source0-md5:	494936de3c57cd12c3115707be2ca20e
+#Source0Download: https://gitlab.com/accounts-sso/libsignon-glib/tags
+Source0:	https://gitlab.com/accounts-sso/libsignon-glib/-/archive/%{version}/%{name}-%{version}.tar.bz2
+# Source0-md5:	9558f1e6658b4fad34420349edd41439
+# submodule
+Source1:	https://gitlab.com/accounts-sso/signon-dbus-specification/-/archive/67487954653006ebd0743188342df65342dc8f9b/signon-dbus-specification-67487954653006ebd0743188342df65342dc8f9b.tar.bz2
+# Source1-md5:	21f2a3bf51a6c7eb6f74a2d3c776fcb9
 URL:		https://gitlab.com/accounts-sso/libsignon-glib
-BuildRequires:	autoconf >= 2.64
-BuildRequires:	automake >= 1:1.11
 %{?with_tests:BuildRequires:	check-devel >= 0.9.4}
 BuildRequires:	glib2-devel >= 1:2.36
 BuildRequires:	gobject-introspection-devel >= 1.30.0
 BuildRequires:	gtk-doc >= 1.14
-BuildRequires:	libtool >= 2:2.2
+BuildRequires:	meson
+BuildRequires:	ninja >= 1.5
 BuildRequires:	pkgconfig
-BuildRequires:	python-pygobject3-devel >= 3.0
-BuildRequires:	rpmbuild(macros) >= 1.219
-BuildRequires:	signon-devel >= 8.40
+%{?with_python2:BuildRequires:	python-pygobject3-devel >= 3.0}
+BuildRequires:	python3-pygobject3-devel >= 3.0
+BuildRequires:	rpmbuild(macros) >= 1.736
+BuildRequires:	vala
 Requires:	glib2 >= 1:2.36
-Requires:	signon-libs >= 8.40
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -46,7 +49,6 @@ Summary(pl.UTF-8):	Pliki programistyczne biblioteki libsignon-glib
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
 Requires:	glib2-devel >= 1:2.36
-Requires:	signon-devel >= 8.40
 
 %description devel
 Development files for libsignon-glib library.
@@ -81,17 +83,30 @@ API documentation for libsignon-glib library.
 Dokumentacja API biblioteki libsignon-glib.
 
 %package -n python-libsignon-glib
-Summary:	Python bindings for libsignon-glib
-Summary(pl.UTF-8):	Wiązania Pythona do biblioteki libsignon-glib
+Summary:	Python 2 bindings for libsignon-glib
+Summary(pl.UTF-8):	Wiązania Pythona 2 do biblioteki libsignon-glib
 Group:		Development/Languages/Python
 Requires:	%{name} = %{version}-%{release}
 Requires:	python-pygobject3 >= 3
 
 %description -n python-libsignon-glib
-Python bindings for libsignon-glib.
+Python 2 bindings for libsignon-glib.
 
 %description -n python-libsignon-glib -l pl.UTF-8
-Wiązania Pythona do biblioteki libsignon-glib.
+Wiązania Pythona 2 do biblioteki libsignon-glib.
+
+%package -n python3-libsignon-glib
+Summary:	Python 3 bindings for libsignon-glib
+Summary(pl.UTF-8):	Wiązania Pythona 3 do biblioteki libsignon-glib
+Group:		Development/Languages/Python
+Requires:	%{name} = %{version}-%{release}
+Requires:	python3-pygobject3 >= 3
+
+%description -n python3-libsignon-glib
+Python 3 bindings for libsignon-glib.
+
+%description -n python3-libsignon-glib -l pl.UTF-8
+Wiązania Pythona 3 do biblioteki libsignon-glib.
 
 %package -n vala-libsignon-glib
 Summary:	Vala API for libsignon-glib
@@ -110,32 +125,37 @@ Vala API for libsignon-glib.
 API języka Vala do biblioteki libsignon-glib.
 
 %prep
-%setup -q -n %{name}-VERSION_%{version}-e90302e342bfd27bc8c9132ab9d0ea3d8723fd03
+%setup -q
+tar xf %{SOURCE1} -C libsignon-glib/interfaces --strip-components 1
+
+%if %{with static_libs}
+%{__sed} -i -e '/^libsignon_glib_lib =/ s/shared_library/library/' libsignon-glib/meson.build
+%endif
 
 %build
-%{__gtkdocize} --flavour no-tmpl
-%{__libtoolize}
-%{__aclocal} -I m4
-%{__autoconf}
-%{__autoheader}
-%{__automake}
-%configure \
-	--enable-gtk-doc \
-	--disable-silent-rules \
-	%{?with_static_libs:--enable-static} \
-	%{!?with_tests:--disable-tests} \
-	--with-html-dir=%{_gtkdocdir}
-%{__make} -j1
+%meson build \
+	-Ddocumentation=true \
+	-Dintrospection=true \
+	-Dpython=true \
+	-Dtests=%{__true_false tests}
+
+%ninja_build -C build
 
 %install
 rm -rf $RPM_BUILD_ROOT
-%{__make} install \
-	DESTDIR=$RPM_BUILD_ROOT
 
-# obsoleted by pkg-config
-%{__rm}	$RPM_BUILD_ROOT%{_libdir}/libsignon-glib.la
+%ninja_install -C build
 
+%py3_comp $RPM_BUILD_ROOT%{py3_sitedir}/gi/overrides
+%py3_ocomp $RPM_BUILD_ROOT%{py3_sitedir}/gi/overrides
+
+%if %{with python2}
+install -d $RPM_BUILD_ROOT%{py_sitedir}/gi/overrides
+cp -p pygobject/Signon.py $RPM_BUILD_ROOT%{py_sitedir}/gi/overrides
+%py_comp $RPM_BUILD_ROOT%{py_sitedir}/gi/overrides
+%py_ocomp $RPM_BUILD_ROOT%{py_sitedir}/gi/overrides
 %py_postclean
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -145,15 +165,15 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS ChangeLog NEWS README.md
+%doc AUTHORS NEWS README.md
 %attr(755,root,root) %{_libdir}/libsignon-glib.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libsignon-glib.so.1
-%{_libdir}/girepository-1.0/Signon-1.0.typelib
+%attr(755,root,root) %ghost %{_libdir}/libsignon-glib.so.2
+%{_libdir}/girepository-1.0/Signon-2.0.typelib
 
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libsignon-glib.so
-%{_datadir}/gir-1.0/Signon-1.0.gir
+%{_datadir}/gir-1.0/Signon-2.0.gir
 %{_includedir}/libsignon-glib
 %{_pkgconfigdir}/libsignon-glib.pc
 
@@ -167,10 +187,18 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %{_gtkdocdir}/libsignon-glib
 
+%if %{with python2}
 %files -n python-libsignon-glib
 %defattr(644,root,root,755)
 %{py_sitedir}/gi/overrides/Signon.py[co]
+%endif
+
+%files -n python3-libsignon-glib
+%defattr(644,root,root,755)
+%{py3_sitedir}/gi/overrides/Signon.py
+%{py3_sitedir}/gi/overrides/__pycache__/Signon.cpython-*.py[co]
 
 %files -n vala-libsignon-glib
 %defattr(644,root,root,755)
-%{_datadir}/vala/vapi/signon.vapi
+%{_datadir}/vala/vapi/libsignon-glib.deps
+%{_datadir}/vala/vapi/libsignon-glib.vapi
