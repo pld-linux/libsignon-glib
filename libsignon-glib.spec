@@ -72,9 +72,7 @@ Statyczna biblioteka libsignon-glib.
 Summary:	API documentation for libsignon-glib library
 Summary(pl.UTF-8):	Dokumentacja API biblioteki libsignon-glib
 Group:		Documentation
-%if "%{_rpmversion}" >= "5"
 BuildArch:	noarch
-%endif
 
 %description apidocs
 API documentation for libsignon-glib library.
@@ -114,9 +112,7 @@ Summary(pl.UTF-8):	API języka Vala do biblioteki libsignon-glib
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
 Requires:	vala
-%if "%{_rpmversion}" >= "5"
 BuildArch:	noarch
-%endif
 
 %description -n vala-libsignon-glib
 Vala API for libsignon-glib.
