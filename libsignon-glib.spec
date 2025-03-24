@@ -27,7 +27,7 @@ BuildRequires:	ninja >= 1.5
 BuildRequires:	pkgconfig
 %{?with_python2:BuildRequires:	python-pygobject3-devel >= 3.0}
 BuildRequires:	python3-pygobject3-devel >= 3.0
-BuildRequires:	rpmbuild(macros) >= 1.736
+BuildRequires:	rpmbuild(macros) >= 2.042
 BuildRequires:	vala
 Requires:	glib2 >= 1:2.36
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
