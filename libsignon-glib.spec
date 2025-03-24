@@ -8,7 +8,7 @@ Summary:	Single signon authentication library for GLib applications
 Summary(pl.UTF-8):	Biblioteka pojedynczego uwierzytelniania dla aplikacji opartych na bibliotece GLib
 Name:		libsignon-glib
 Version:	2.1
-Release:	9
+Release:	10
 License:	LGPL v2.1
 Group:		Libraries
 #Source0Download: https://gitlab.com/accounts-sso/libsignon-glib/tags
@@ -129,18 +129,18 @@ tar xf %{SOURCE1} -C libsignon-glib/interfaces --strip-components 1
 %endif
 
 %build
-%meson build \
+%meson \
 	-Ddocumentation=true \
 	-Dintrospection=true \
 	-Dpython=true \
 	-Dtests=%{__true_false tests}
 
-%ninja_build -C build
+%meson_build
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
-%ninja_install -C build
+%meson_install
 
 %py3_comp $RPM_BUILD_ROOT%{py3_sitedir}/gi/overrides
 %py3_ocomp $RPM_BUILD_ROOT%{py3_sitedir}/gi/overrides
